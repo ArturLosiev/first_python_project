@@ -1,7 +1,23 @@
-print("Hello, ČVUT FEL!")
+import requests
+import json
 
-def check_environment():
-    import sys
-    return sys.version
+def get_dog_facts()->dict:
+    url = "https://catfact.ninja/fact"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(e)
 
-print(f"Python version inside WSL: {check_environment()}")
+
+if __name__ != "__main__":
+    pass
+else:
+    data = get_dog_facts()
+    if "fact" in data:
+        fact = data["fact"]
+        if fact != None:
+            print(f"Random fact: {fact}")
+    else:
+        print("No facts")
