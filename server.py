@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI,Depends,HTTPException
 from database import engine,SessionLocal
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -23,6 +23,14 @@ def get_db():
 def read_facts(db: Session = Depends(get_db)):
     facts = db.query(models.FactDB).all()
     return {"facts": facts}
+
+@app.get("/facts/{fact_id}")
+def read_fact(fact_id: int, db: Session = Depends(get_db)):
+    fact = db.query(models.FactDB).filter(models.FactDB.id == fact_id).first()
+    if fact is None:
+        raise HTTPException(status_code=404, detail="Fact not found")
+    return {"fact": fact.new_fact}
+
 
 @app.post("/add-fact")
 def create_fact(payload: FactRequest, db: Session = Depends(get_db)):
